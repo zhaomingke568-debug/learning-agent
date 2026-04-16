@@ -34,7 +34,11 @@ def main():
         "reduce_data_error": None,
         "next_step": None,
 
-        "loop_count": 0#搜索循环次数
+        "loop_count": 0,#搜索循环次数
+        "feedback": None,
+        "summary": None,
+
+
 
     }
 

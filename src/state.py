@@ -23,4 +23,6 @@ class AgentState(TypedDict):
     pdf_context: Annotated[List[dict], operator.add]
     
     next_step: str
+    user_feedback: str     # 👈 新增：用来存储用户的修改要求
+    summary: str#汇总会话内容
     

@@ -18,7 +18,8 @@ from pydantic import BaseModel, Field
 llm = ChatAnthropic(
     model="MiniMax-M2.7",
     anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
-    anthropic_api_url=os.getenv("ANTHROPIC_BASE_URL")
+    anthropic_api_url=os.getenv("ANTHROPIC_BASE_URL"),
+    max_retries=5
     
 )
 class SearchQueries(BaseModel):
@@ -230,19 +231,83 @@ def synthesis_node(state: AgentState) -> dict:
         # 发生错误时，将错误信息写入 state
         return {"synthesis_error": f"synthesis_error: {e}"}
 
-def reduce_data_node(state: AgentState) -> dict:
-    """
-    Reduces the amount of data in the state if synthesis failed,
-    to attempt regeneration with less information.
-    """
-    print("--- REDUCING DATA FOR RETRY ---")
+
+
+    # 节点 1：获取用户反馈 (代替之前的直接结束)
+def get_feedback_node(state: AgentState):
+    print("\n" + "="*40)
+    print("🤖 AI: 内容已生成完毕！你可以向上滚动查看。")
+    print("="*40)
     
-    # Clear some results to force a retry with less data
-    # For example, keep only the top 1 result from each category
-    reduced_state = state.copy()
-    reduced_state["paper_results"] = reduced_state.get("paper_results", [])[:1]
-    reduced_state["github_results"] = reduced_state.get("github_results", [])[:1]
-    reduced_state["youtube_results"] = reduced_state.get("youtube_results", [])[:1]
-    reduced_state["synthesis_error"] = "" # Clear the error for retry
+    # 在命令行等待用户输入
+    feedback = input("👉 请输入修改要求 (若满意请直接按回车，或输入 'ok' / '无'): ")
     
-    return reduced_state
+    # 将用户的反馈存入状态
+    return {"user_feedback": feedback}
+
+# 节点 2：根据反馈重新生成内容
+def adjust_node(state: AgentState):
+    print("\n--- ✍️ 正在根据你的要求进行修改... ---")
+    
+    old_content = state.get("final_report", "")
+    feedback = state.get("user_feedback", "")
+    
+    # 构建包含用户反馈的 Prompt
+    adjust_prompt = f"""
+    这是你之前生成的内容：
+    {old_content}
+    
+    用户提出了以下修改要求：
+    {feedback}
+    
+    请严格按照用户的要求，对上面的内容进行修改和完善，并输出最终结果。
+    """
+    
+    # 假设你使用的是 model.invoke
+    response = llm.invoke(adjust_prompt)
+    
+    # 用修改后的新内容覆盖旧内容，并清空当前反馈（为下一轮做准备）
+    return {
+        "final_report": response.content,
+        "user_feedback": "" 
+    }
+
+from langchain_core.messages import RemoveMessage, SystemMessage, HumanMessage
+
+def summarize_node(state: AgentState):
+    print("\n--- 🗜️ 触发记忆压缩：正在总结早期对话 ---")
+    
+    summary = state.get("summary", "")
+    messages = state["messages"]
+    
+    # 策略：保留最后 2 条消息（最近的一问一答），把更早的消息全总结掉
+    # 注意：根据你的实际情况，你也可以选择保留最后 4 条或 6 条
+    messages_to_summarize = messages[:-2]
+    
+    # 1. 构建总结用的 Prompt
+    if summary:
+        # 如果已经有摘要了，就让 LLM 把新产生的老消息“合并”进旧摘要里
+        summary_prompt = (
+            f"这是之前的对话摘要: {summary}\n\n"
+            "请结合以下新产生的对话记录，更新并扩写这个摘要，保留所有关键的用户指令、偏好和已完成的规划内容：\n\n"
+            f"{messages_to_summarize}"
+        )
+    else:
+        # 如果是第一次总结
+        summary_prompt = (
+            f"请简要总结以下对话内容，重点记录用户的核心目标、修改要求和当前进度：\n\n"
+            f"{messages_to_summarize}"
+        )
+        
+    # 2. 调用模型生成新摘要
+    response = model.invoke([HumanMessage(content=summary_prompt)])
+    
+    # 3. 核心机制：生成“删除指令”
+    # 在 LangGraph 中，返回带有 RemoveMessage(id) 的列表，底层会自动帮你从 State 中删掉它们
+    delete_messages = [RemoveMessage(id=m.id) for m in messages_to_summarize]
+    
+    return {
+        "summary": response.content,
+        "messages": delete_messages  # 👈 这里执行了物理删除，释放 Token 空间
+    }
+
