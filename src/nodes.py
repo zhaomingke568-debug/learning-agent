@@ -157,16 +157,18 @@ def review_node(state: AgentState) -> str:
     # 1. 检查是否三大源都拿到了数据
     if len(papers) > 0 and len(github) > 0 and len(youtube) > 0:
         print("--- ✅ INFO SUFFICIENT: Moving to Synthesis ---")
-        return "synthesis"
+        return {"next_step": "synthesis"}
     
     # 2. 防死循环：如果已经重试了 2 次（总共执行了 3 次），强制进入总结
     if loop_count >= 3:
         print("--- ⚠️ MAX RETRIES REACHED: Forcing Synthesis ---")
-        return "synthesis"
+        return {"next_step": "synthesis"}
         
     # 3. 触发重试逻辑：回到 Plan 节点重新生成查询词
     print("--- 🔄 INFO INSUFFICIENT: Retrying Plan Node ---")
-    return "plan"
+    return {"next_step": "plan"}
+
+
 
 def synthesis_node(state: AgentState) -> dict:
     """Generate final Markdown report."""

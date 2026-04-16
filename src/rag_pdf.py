@@ -5,8 +5,8 @@ from langchain_openai import OpenAIEmbeddings # 如果用 Minimax，请替换为
 from langchain_community.vectorstores import FAISS
 from src.state import AgentState
 def pdf_rag_node(state: AgentState) -> dict:
-    """处理本地 PDF 文件的 RAG 节点"""
-    print("--- 📖 EXECUTING DEEP READ (PDF RAG) ---")
+    """Extract precise context from downloaded PDFs."""
+    print("--- EXECUTING DEEP READ (PDF RAG) ---")
     
     pdf_paths = state.get("downloaded_pdfs", [])
     topic = state.get("topic", "")

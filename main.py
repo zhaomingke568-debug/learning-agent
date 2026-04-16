@@ -20,14 +20,21 @@ def main():
     initial_state = {
         "topic": topic,
         "depth_level": depth,
+
         "search_queries": {},
+
         "paper_results": [],
         "github_results": [],
         "youtube_results": [],
+
         "final_report": None,
+
         "errors": [],
         "synthesis_error": None,
-        "reduce_data_error": None
+        "reduce_data_error": None,
+        "next_step": None,
+
+        "loop_count": 0#搜索循环次数
 
     }
 
@@ -36,7 +43,7 @@ def main():
     
     print(f"\n--- Starting Learning Agent for: {topic} ---\n")
     config = {"configurable": {"thread_id": "user_123"}}
-    message={"messages": [HumanMessage(content=user_query)]}
+    #messages={"messages": [Message(content=user_query)]}
     # Run the workflow
     final_state = app.invoke(initial_state, config=config, messages=Message)
 
@@ -48,7 +55,7 @@ def main():
         print(final_state["final_report"])
         
         # Optionally save to file
-        filename = f"learning_guide_{topic.replace(' ', '_')}.md"
+        filename = f"learning_guide_{topic.replace(' ', '_')}.html"
         with open(filename, "w", encoding="utf-8") as f:
             f.write(final_state["final_report"])
         print(f"\nReport saved to {filename}")

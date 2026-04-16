@@ -22,4 +22,5 @@ class AgentState(TypedDict):
     # RAG 节点提取出的精准片段，使用 operator.add 累加
     pdf_context: Annotated[List[dict], operator.add]
     
+    next_step: str
     

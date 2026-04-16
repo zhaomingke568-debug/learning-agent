@@ -9,3 +9,6 @@ python-dotenv
 pydantic
 openai
 anthropic
+langchain-community
+pypdf
+youtube-transcript-api

@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent 入门指南 | 从理论到实践的完整学习路径</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-700 font-sans antialiased">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="max-w-6xl mx-auto px-6 py-16 md:py-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-sm font-medium">
+                    🚀 入门级
+                </span>
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                AI Agent
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-3xl leading-relaxed">
+                人工智能代理是能够感知环境、做出决策并执行行动以完成特定目标的智能系统。本指南将带你从基础理论出发，通过实践项目和视频教程，掌握 AI Agent 的核心概念与开发方法。
+            </p>
+            <div class="flex flex-wrap gap-4 mt-8">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-5 py-3">
+                    <div class="text-2xl font-bold">10+</div>
+                    <div class="text-sm text-white/80">相关论文</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-5 py-3">
+                    <div class="text-2xl font-bold">50+</div>
+                    <div class="text-sm text-white/80">开源项目</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-5 py-3">
+                    <div class="text-2xl font-bold">20+</div>
+                    <div class="text-sm text-white/80">视频教程</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-16">
+        <!-- Navigation -->
+        <nav class="sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100 mb-12 -mx-6 px-6">
+            <div class="flex gap-8 py-4 overflow-x-auto">
+                <a href="#theory" class="text-gray-600 hover:text-indigo-600 font-medium whitespace-nowrap transition-colors">📚 理论基础</a>
+                <a href="#practice" class="text-gray-600 hover:text-indigo-600 font-medium whitespace-nowrap transition-colors">💻 实践实现</a>
+                <a href="#tutorials" class="text-gray-600 hover:text-indigo-600 font-medium whitespace-nowrap transition-colors">🎬 视频教程</a>
+            </div>
+        </nav>
+
+        <!-- Theory Section -->
+        <section id="theory" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-3xl">📚</span>
+                <h2 class="text-3xl font-bold text-gray-900">理论基础</h2>
+            </div>
+            <p class="text-gray-600 mb-8 text-lg max-w-3xl">
+                深入理解 AI Agent 的发展历程、架构设计和核心技术。通过阅读这些精选论文，建立扎实的理论基础。
+            </p>
+            
+            <div class="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Paper 1 -->
+                <article class="bg-white rounded-2xl p-6 card-hover border border-gray-100">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">综述</span>
+                        <span class="text-gray-400 text-sm">2025-03</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 leading-snug">
+                        <a href="http://arxiv.org/abs/2503.12687v1" target="_blank" class="hover:text-indigo-600 transition-colors">
+                            AI Agents: Evolution, Architecture, and Real-World Applications
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        全面回顾 AI Agent 从早期规则系统到现代 LLM 驱动系统的演进历程，详细分析感知、规划和工具使用等核心模块架构，并提出兼顾效果、效率、鲁棒性和安全性的综合评估框架。
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">LLM</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">架构</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">评估</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <span class="font-medium">作者:</span> Naveen Krishnan
+                    </div>
+                </article>
+
+                <!-- Paper 2 -->
+                <article class="bg-white rounded-2xl p-6 card-hover border border-gray-100">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full">工具学习</span>
+                        <span class="text-gray-400 text-sm">2024-01</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 leading-snug">
+                        <a href="http://arxiv.org/abs/2401.07324v3" target="_blank" class="hover:text-indigo-600 transition-colors">
+                            Small LLMs Are Weak Tool Learners: A Multi-LLM Agent
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        针对小模型工具调用能力弱的问题，提出将 Agent 能力分解为规划器、调用器和摘要器三个角色，由独立 LLM 分别负责，通过两阶段训练实现高效协作，显著提升小模型的工具使用能力。
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">多智能体</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">工具调用</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">微调</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <span class="font-medium">作者:</span> Weizhou Shen, Chenliang Li 等
+                    </div>
+                </article>
+
+                <!-- Paper 3 -->
+                <article class="bg-white rounded-2xl p-6 card-hover border border-gray-100">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">应用</span>
+                        <span class="text-gray-400 text-sm">2024-09</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3 leading-snug">
+                        <a href="http://arxiv.org/abs/2409.01907v1" target="_blank" class="hover:text-indigo-600 transition-colors">
+                            Focus Agent: LLM-Powered Virtual Focus Group
+                        </a>
+                    </h3>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        创新性地使用 LLM 模拟焦点小组，既能充当主持人引导讨论，又能生成与真实用户相似的观点数据，有效降低用户研究成本，为 AI 在定性研究中的应用开辟新途径。
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">人机交互</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">模拟</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">研究</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <span class="font-medium">作者:</span> Taiyu Zhang, Xuesong Zhang 等
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Practice Section -->
+        <section id="practice" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-3xl">💻</span>
+                <h2 class="text-3xl font-bold text-gray-900">实践实现</h2>
+            </div>
+            <p class="text-gray-600 mb-8 text-lg max-w-3xl">
+                通过这些优质开源项目动手实践。从快速入门模板到生产级框架，找到最适合你的学习起点。
+            </p>
+            
+            <div class="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Repo 1 -->
+                <article class="bg-white rounded-2xl p-6 card-hover border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            <span class="font-semibold text-gray-900">lastmile-ai/mcp-agent</span>
+                        </div>
+                        <div class="flex items-center gap-1 bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                            <span class="font-semibold text-sm">8,269</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        微软开源的 Model Context Protocol (MCP) Agent 开发框架，提供简单的工作流模式帮助你构建高效的 AI 代理。包含完整的工具调用、上下文管理和多步骤任务执行能力。
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">MCP</span>
+                        <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded">TypeScript</span>
+                        <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">微软</span>
+                    </div>
+                    <a href="https://github.com/lastmile-ai/mcp-agent" target="_blank" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-medium text-sm transition-colors">
+                        查看仓库
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                    </a>
+                </article>
+
+                <!-- Repo 2 -->
+                <article class="bg-white rounded-2xl p-6 card-hover border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.

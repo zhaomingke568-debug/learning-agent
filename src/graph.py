@@ -43,13 +43,13 @@ def build_graph():
 
         # Conditional routing from review
     workflow.add_conditional_edges(
-            "review",
-            lambda x: review_node(x),
-            {
-                "synthesis": "synthesis",
-                "plan": "plan"
-            }
-        )
+    "review",                       # 起点
+    should_we_synthesize,           # 判断逻辑 (不用写 lambda 也行，直接传函数名)
+    {
+        "synthesis": "synthesis",   # 如果返回 "synthesis"，去总结
+        "plan": "plan"              # 如果返回 "plan"，回退去重新计划
+    }
+)
     # 新增一条条件路由
     workflow.add_conditional_edges(
         "synthesis", 
@@ -74,3 +74,10 @@ def check_synthesis_status(state: AgentState) -> str:
         return "reduce_data_node" 
 
     return END
+
+
+def should_we_synthesize(state):
+    if state.get("next_step", "") == "synthesis" :
+        return "synthesis"
+    else:
+        return "plan"
