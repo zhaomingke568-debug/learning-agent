@@ -2,6 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
+from langgraph.constants import END
 # Ensure environment variables are loaded before initializing LLM
 load_dotenv(dotenv_path='.env')
 
@@ -63,4 +64,51 @@ def intelligent_router(state: AgentState) -> str:
         return "plan"
     else:
         print("👉 诊断：【仅需修改文本格式】，启动小循环：进入修改节点 (Revise)...")
+        return "revise"
+
+def should_summarize_router(state: AgentState) -> str:
+    """检查是否需要压缩上下文"""
+    messages = state["messages"]
+
+    # 设定阈值：例如，当对话超过 6 条时触发压缩
+    if len(messages) > 6:
+        return "summarize"
+
+    # 如果没超标，就正常走下一步（比如回到规划节点或结束）
+    # 这里假设我们把它放在获取用户反馈之后，如果不压缩，就去判断用户的反馈意图
+    return "check_feedback"
+
+
+def feedback_router(state: AgentState) -> str:
+    """
+    处理用户反馈的路由：检查是否需要总结，以及反馈路由逻辑。
+    返回: "summarize" | "end" | "plan" | "revise"
+    """
+    messages = state["messages"]
+
+    # 1. 如果消息过多，先压缩
+    if len(messages) > 6:
+        return "summarize"
+
+    # 2. 否则，基于用户反馈路由
+    feedback = state.get("user_feedback", "").strip()
+
+    # 极速通道
+    if not feedback or feedback.lower() in ["ok", "无", "没有", "满意", "不需要"]:
+        print("\n--- 🎉 用户无修改要求，学习路径生成完毕！ ---")
+        return "end"
+
+    # 智能判断：是否需要补充知识
+    prompt = f"""
+    分析用户修改要求："{feedback}"
+    如果需要补充新知识，输出 "plan"；如果只是文本改写，输出 "revise"。
+    只输出一个词。
+    """
+    decision = llm_router.invoke(prompt).content.strip().upper()
+
+    if "PLAN" in decision:
+        print("👉 诊断：【需要补充新知识】，启动大循环...")
+        return "plan"
+    else:
+        print("👉 诊断：【仅需修改文本格式】，启动小循环...")
         return "revise"

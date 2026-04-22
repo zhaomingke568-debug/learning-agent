@@ -1,11 +1,14 @@
+import os
+import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-import json
-small_llm =  ChatAnthropic(
+from langchain_anthropic import ChatAnthropic
+from src.state import AgentState
+
+small_llm = ChatAnthropic(
     model="MiniMax-M2.5-highspeed",
     anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
     anthropic_api_url=os.getenv("ANTHROPIC_BASE_URL")
-    
 )
 def reduce_data_node(state: AgentState) -> dict:
     """使用小模型对超长上下文进行高密度压缩"""

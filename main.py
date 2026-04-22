@@ -38,6 +38,8 @@ def main():
         "feedback": None,
         "summary": None,
 
+        "downloaded_pdfs": [],
+
 
 
     }
