@@ -77,7 +77,8 @@ def code_execution_node(state: AgentState) -> dict:
     return {
         "code_execution_result": result,
         "user_code": user_code,
-        "next_step": "get_feedback"
+        "review_type": "code",
+        "next_step": "review"
     }
 
 

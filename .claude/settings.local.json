@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_memory.py -v)",
+      "Bash(.venv/Scripts/python.exe tests/test_memory.py)",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(E:/learning-agent/.venv/Scripts/python.exe *)",
+      "Bash(python -c ' *)",
+      "Bash(.venv/Scripts/python -c ' *)",
+      "Bash(where python *)"
+    ]
+  }
+}

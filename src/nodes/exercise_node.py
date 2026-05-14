@@ -57,7 +57,8 @@ def exercise_node(state: AgentState) -> dict:
 
     return {
         "current_exercise": exercise,
-        "next_step": "code_execution"
+        "review_type": "exercise",
+        "next_step": "review"
     }
 
 

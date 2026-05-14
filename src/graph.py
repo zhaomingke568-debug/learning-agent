@@ -9,11 +9,14 @@ from src.state import AgentState
 
 def build_graph():
     """
-    构建 Phase 1 的基础 StateGraph。
+    构建 Phase 2 的 StateGraph（含 RAG + Review）。
 
-    流程：START → assess_capability → learning_path_planning
-          → knowledge_explanation → exercise_generation
-          → code_execution → get_feedback
+    流程：
+    START → assess_capability → learning_path_planning
+          → knowledge_explanation → review(explanation)
+          → exercise_generation → review(exercise)
+          → code_execution → review(code)
+          → report_generation → get_feedback
           → (继续? advance_milestone → explanation : END)
     """
     workflow = StateGraph(AgentState)
@@ -26,6 +29,8 @@ def build_graph():
     from src.nodes.code_execution_node import code_execution_node
     from src.nodes.feedback_node import get_feedback_node
     from src.nodes.advance_node import advance_milestone_node
+    from src.nodes.review_node import review_node
+    from src.nodes.report_node import report_node
 
     # === 注册节点 ===
     workflow.add_node("assess_capability", assessment_node)
@@ -35,18 +40,39 @@ def build_graph():
     workflow.add_node("code_execution", code_execution_node)
     workflow.add_node("get_feedback", get_feedback_node)
     workflow.add_node("advance_milestone", advance_milestone_node)
+    workflow.add_node("review", review_node)
+    workflow.add_node("report_generation", report_node)
 
     # === 设置边 ===
     workflow.add_edge(START, "assess_capability")
     workflow.add_edge("assess_capability", "learning_path_planning")
     workflow.add_edge("learning_path_planning", "knowledge_explanation")
-    workflow.add_edge("knowledge_explanation", "exercise_generation")
-    workflow.add_edge("exercise_generation", "code_execution")
-    workflow.add_edge("code_execution", "get_feedback")
+
+    # === 知识讲解 → review(explanation) ===
+    workflow.add_edge("knowledge_explanation", "review")
+
+    # === exercise_generation → review(exercise) ===
+    workflow.add_edge("exercise_generation", "review")
+
+    # === code_execution → review(code) ===
+    workflow.add_edge("code_execution", "review")
+
+    # === review → 根据 verdict 决定后续节点 ===
+    workflow.add_conditional_edges(
+        "review",
+        _review_router,
+        {
+            "continue_explanation": "knowledge_explanation",  # 讲解不通过，重新生成
+            "continue_exercise": "exercise_generation",        # 练习不通过，重新生成
+            "continue_code": "code_execution",               # 代码不通过，重新提交
+            "continue_report": "report_generation",          # 审核通过，生成报告
+            "continue_feedback": "get_feedback"              # 代码审核通过，进入反馈
+        }
+    )
+
+    workflow.add_edge("report_generation", "get_feedback")
 
     # === 反馈循环 ===
-    # 用户选择继续 → advance_milestone → explanation
-    # 用户选择结束 → END
     workflow.add_conditional_edges(
         "get_feedback",
         _feedback_router,
@@ -58,6 +84,34 @@ def build_graph():
     workflow.add_edge("advance_milestone", "knowledge_explanation")
 
     return workflow.compile()
+
+
+def _review_router(state: AgentState) -> str:
+    """
+    Review 路由：根据 review_type 和 verdict 决定后续节点。
+    """
+    review_type = state.get("review_type", "explanation")
+    review_result = state.get("review_result", {})
+    verdict = review_result.get("verdict", "approved")
+
+    # 如果审核不通过，返回到对应节点重新生成
+    if verdict == "needs_revision":
+        if review_type == "explanation":
+            return "continue_explanation"
+        elif review_type == "exercise":
+            return "continue_exercise"
+        elif review_type == "code":
+            return "continue_code"
+
+    # 审核通过，根据 review_type 决定后续
+    if review_type == "explanation":
+        return "continue_exercise"  # 讲解通过，进入练习生成
+    elif review_type == "exercise":
+        return "continue_code"      # 练习通过，进入代码执行
+    elif review_type == "code":
+        return "continue_feedback" # 代码通过，进入反馈（或报告）
+    else:
+        return "continue_feedback"
 
 
 def _feedback_router(state: AgentState) -> str:

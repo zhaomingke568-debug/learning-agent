@@ -120,10 +120,15 @@ _input = '''{input_data}'''
 print(_input)
 """
             test_result = self.execute(test_code)
+            def _normalize(value):
+               if value is None:
+                  return ""
+               return str(value).strip()
 
             actual = test_result.get("output", "").strip()
-            expected_normalized = expected.strip()
-            passed = (actual == expected_normalized)
+            actual_normalized = _normalize(actual)
+            expected_normalized = _normalize(expected)
+            passed = (actual_normalized == expected_normalized)
 
             result_entry = {
                 "test_id": test_id,

@@ -7,7 +7,7 @@ load_dotenv(dotenv_path='.env')
 from src.state import AgentState
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from src.tools.rag.enhanced_rag import get_official_docs_rag
 
 
 llm = ChatAnthropic(
@@ -41,9 +41,12 @@ def explanation_node(state: AgentState) -> dict:
 
     print(f"\n--- 📖 知识点讲解：{current_topic} ---")
 
-    # 获取 RAG 上下文
+    # 获取 RAG 上下文（PDF + 官方文档检索）
     pdf_context = state.get("pdf_context", [])
-    official_docs = state.get("official_docs_context", [])
+
+    # 从官方文档 RAG 检索相关片段
+    official_docs_rag = get_official_docs_rag()
+    official_docs = official_docs_rag.retrieve(current_topic, k=3)
 
     # 构建 RAG 上下文字符串
     rag_context = ""
@@ -58,20 +61,23 @@ def explanation_node(state: AgentState) -> dict:
         user_level=user_profile.get("capability_level", depth_level),
         weak_points=assessment_result.get("weaknesses", []),
         description=current_milestone.get("description", ""),
-        rag_context=rag_context
+        rag_context=rag_context,
+        official_docs=official_docs
     )
 
     print(f"\n--- ✅ 讲解生成完毕 ---\n")
 
     return {
         "current_explanation": explanation,
-        "explanation_references": pdf_context[:3] + official_docs[:3],
-        "next_step": "exercise_generation"
+        "explanation_references": pdf_context[:3] + official_docs,
+        "official_docs_context": official_docs,
+        "review_type": "explanation",
+        "next_step": "review"
     }
 
 
 def _generate_explanation(topic: str, user_level: str, weak_points: List[str],
-                          description: str, rag_context: str) -> str:
+                          description: str, rag_context: str, official_docs: List[Dict]) -> str:
     """使用 LLM 生成知识点讲解"""
     weak_points_str = ", ".join(weak_points) if weak_points else "无"
 
@@ -88,6 +94,7 @@ def _generate_explanation(topic: str, user_level: str, weak_points: List[str],
 用户薄弱点：{weak_points_str}
 
 {rag_context}
+{official_docs}
 """),
         ("human", """讲解主题：{topic}
 主题描述：{description}
@@ -107,7 +114,11 @@ def _generate_explanation(topic: str, user_level: str, weak_points: List[str],
     try:
         result = chain.invoke({
             "topic": topic,
-            "description": description
+            "description": description,
+            "rag_context": rag_context,
+            "official_docs": official_docs,
+            "weak_points": weak_points_str,
+            "user_level": user_level    
         })
         return result
     except Exception as e:

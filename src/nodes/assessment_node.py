@@ -114,33 +114,29 @@ def _generate_questions(topic: str, depth_level: str) -> List[Dict]:
   {{"question": "题目内容", "options": ["A. 选项1", "B. 选项2", "C. 选项3", "D. 选项4"], "correct_answer": "B", "explanation": "解释"}}
 ]}}
 """
-
+    
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
         ("human", "为主题「{topic}」（{depth_level}）生成诊断题目")
     ])
-
+    
     try:
-        chain = prompt | llm | StrOutputParser()
-        result = chain.invoke({"topic": topic, "depth_level": depth_level})
+        structured_llm = llm.with_structured_output(QuestionsList)
+        chain = prompt | structured_llm
 
-        # 手动解析 JSON
-        import json
-        # 尝试提取 JSON 部分
-        json_str = result.strip()
-        if json_str.startswith("```"):
-            # 去除 markdown 代码块
-            lines = json_str.split("\n")
-            json_str = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
+        result = chain.invoke({
+            "topic": topic,
+            "depth_level": depth_level
+        })
 
-        parsed = json.loads(json_str)
-        questions = parsed.get("questions", [])
+        print(f"Debug: structured invoke succeeded, result type={type(result)}")
 
-        if not questions:
-            raise ValueError(f"No questions in parsed result: {parsed}")
+        if not result.questions:
+            raise ValueError("questions 为空")
 
-        # 转换为 dict 格式
-        return questions
+        return [q.model_dump() for q in result.questions]
+    
+        
     except Exception as e:
         print(f"生成题目失败，使用默认题目: {e}")
         # 返回默认题目
